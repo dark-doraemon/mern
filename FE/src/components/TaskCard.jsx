@@ -68,6 +68,7 @@ const TaskCard = ({ task, index, handleTasksChanged }) => {
         }
 
     }
+
     return (
         <Card className={cn("p-4 bg-gradient-card border shadow-custom-md hover:shadow-custom-lg transition-all duration-200 animate-fade-in group",
             task.status === "completed" && "opacity-75"

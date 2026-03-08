@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import axios from 'axios'
 import api from '@/lib/axios'
+import { visibleTaskLimit as visibleTasksLimit } from '@/lib/data'
 
 const HomePage = () => {
   const [taskBuffer, setTaskBuffer] = useState([]);
@@ -17,9 +18,18 @@ const HomePage = () => {
   const [completeCount, setCompleteCount] = useState(0);
   const [filter, setFilter] = useState("all");
   const [dateQuery, setDateQuery] = useState("today");
+  const [page,setPage] = useState(1);
+
+
   useEffect(() => {
     fetchTasks();
   }, [dateQuery])
+
+  useEffect(() =>{
+    setPage(1)
+  },[filter,dateQuery])
+
+  
 
   const fetchTasks = async () => {
     try {
@@ -44,13 +54,37 @@ const HomePage = () => {
     }
   });
 
-  console.log(filteredTasks);
 
   const handelTaskChanged = () =>{
     fetchTasks();
   }
 
+  const handleNext = () =>{
+    if(page < totalPages){
+      setPage((prev) => prev + 1);
+    }
+  }
 
+  const handlePrev = () =>{
+    if(page > 1){
+      setPage((prev) => prev - 1);
+    }
+  }
+
+  const handlePageChanged = (page) => {
+    setPage(page);
+  }
+
+  const visibleTasks = filteredTasks.slice((page - 1) * visibleTasksLimit,visibleTasksLimit * page)
+  const totalPages = Math.ceil(filteredTasks.length / visibleTasksLimit);
+
+  if(visibleTasks.length === 0)
+  {
+    handlePrev();
+  }
+
+
+  
   return (
     <>
       <div className="min-h-screen w-full bg-white relative">
@@ -77,11 +111,11 @@ const HomePage = () => {
               completedTasksCount={completeCount}
               activeTasksCount={activeCount} />
 
-            <TaskList tasks={filteredTasks} filter={filter} handleTasksChanged={handelTaskChanged}/>
+            <TaskList tasks={visibleTasks} filter={filter} handleTasksChanged={handelTaskChanged}/>
 
 
             <div className='flex flex-col items-center justify-between gap-6 sm:flex-row'>
-              <TaskListPagination />
+              <TaskListPagination page={page} totalPages={totalPages} handleNext={handleNext} handlePrev={handlePrev} handlePageChanged={handlePageChanged}/>
               <DateTimeFilter dateQuery={dateQuery} setDateQuery={setDateQuery}/>
             </div>
 

@@ -24,3 +24,5 @@ export const options = [
     }
    
 ]
+
+export const visibleTaskLimit = 4;
