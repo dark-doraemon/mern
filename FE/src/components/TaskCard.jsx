@@ -48,7 +48,7 @@ const TaskCard = ({ task, index, handleTasksChanged }) => {
         try {
             if(task.status === "active"){
                 const res = await api.put(`/tasks/${task._id}`, {
-                    status: "complete",
+                    status: "completed",
                     completedAt: new Date().toISOString(),
                 });
                 toast.success(`Task ${task.title} đã được cập nhật thành công`);
@@ -77,12 +77,12 @@ const TaskCard = ({ task, index, handleTasksChanged }) => {
             <div className='flex items-center gap-4 flex-col sm:flex-row'>
                 {/* Nút tròn */}
                 <Button variant='ghost' size='icon' className={cn("flex-0 size-8 rounded-full transition-all duration-200",
-                    task.status === 'complete' ? 'text-success hover:text-success/80' :
+                    task.status === 'completed' ? 'text-success hover:text-success/80' :
                         "text-muted-foreground hover:text-primary"
                 )}
                     onClick={toggleTaskComplete}>
                 {
-                    task.status === 'complete' ?
+                    task.status === 'completed' ?
                         (<CheckCircle2 className='size-5' />) :
                         (<Circle className='size-5' />)
                 }
@@ -101,7 +101,7 @@ const TaskCard = ({ task, index, handleTasksChanged }) => {
                         }}
                         className='flex-1 h-12 text-base border-border/50 focus:border-primary/50 focus:ring-primary/20' />) :
                     (<p className={cn("text-base transition-all duration-200",
-                        task.status === 'complete' ? "line-through text-muted-foreground" : "text-foreground")}
+                        task.status === 'completed' ? "line-through text-muted-foreground" : "text-foreground")}
                     >
                         {task.title}
                     </p>)
