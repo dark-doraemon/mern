@@ -1,15 +1,16 @@
-import {BrowserRouter, Routes, Route} from 'react-router'
+import { BrowserRouter, Routes, Route } from 'react-router'
 import HomePage from './pages/HomePage'
 import NotFound from './pages/NotFound'
+import { Toaster } from 'sonner'
 
 function App() {
-
   return (
     <>
+      <Toaster richColors />
       <BrowserRouter>
         <Routes>
-          <Route path='/' element={<HomePage/>}></Route>
-          <Route path='*' element={<NotFound/>}></Route>
+          <Route path='/' element={<HomePage />}></Route>
+          <Route path='*' element={<NotFound />}></Route>
         </Routes>
       </BrowserRouter>
     </>
