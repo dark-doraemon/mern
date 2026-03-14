@@ -8,9 +8,27 @@ services:
     volumes:
       - mongo_data:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin 
+      MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: 123456
-
+  backend:
+    build: ./BE
+    container_name: backend
+    ports:
+      - "6000:6000"
+    depends_on:
+      - mongodb
+    environment:
+      - PORT=6000
+      - MONGODB_CONNECTIONSTRING=mongodb://admin:123456@localhost:27018
+  frontend:
+    build: ./FE
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      - VITE_BASE_API=http://localhost:6000
 
 volumes:
   mongo_data:
