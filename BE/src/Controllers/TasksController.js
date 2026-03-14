@@ -1,11 +1,12 @@
 import Task from "../Models/Task.js"
 
 export const getAllTasks = async (req, res) => {
-    const {filter = 'today'} = req.query;
+    const pageSize = 5;
+    const { filter = 'today', pageNumber = 1 } = req.query;
     const now = new Date();
     let startDate;
 
-    switch(filter){
+    switch (filter) {
         case 'today':
             startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             break;
@@ -22,22 +23,32 @@ export const getAllTasks = async (req, res) => {
             break;
     }
 
-    const query = startDate ? {createdAt: {$gte: startDate}} : {};
+    const query = startDate ? { createdAt: { $gte: startDate } } : {};
     try {
         const result = await Task.aggregate([
-            {$match: query},
+            { $match: query },
             {
-                $facet:{
-                    tasks: [{$sort: {createdAt: -1}}],
-                    activeCount: [{$match: {status: 'active'}}, {$count: "count"}],
-                    completeCount: [{$match: {status: 'complete'}}, {$count: "count"}]
+                $facet: {
+                    tasks: [
+                        { $sort: { createdAt: -1 } },
+                        { $skip: (pageNumber - 1) * pageSize },
+                        { $limit: pageSize }
+                    ],
+                    totalCount: [
+                        { $count: "count" }
+                    ],
+                    activeCount: [{ $match: { status: 'active' } }, { $count: "count" }],
+                    completeCount: [{ $match: { status: 'complete' } }, { $count: "count" }]
                 }
             }
         ])
         const tasks = result[0].tasks;
+        const totalCount = result[0].totalCount[0]?.count || 0;
         const activeCount = result[0].activeCount[0]?.count || 0;
         const completeCount = result[0].completeCount[0]?.count || 0;
-        return res.status(200).json({tasks, activeCount, completeCount});
+
+        const totalPages = Math.ceil( totalCount / pageSize);
+        return res.status(200).json({ tasks, activeCount, completeCount, totalPages });
     }
     catch (error) {
         console.error("Error fetching tasks: ", error)
